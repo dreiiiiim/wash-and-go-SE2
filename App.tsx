@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import Navbar from './components/Navbar';
+import HomePage from './components/HomePage';
 import BookingWizard from './components/BookingWizard';
 import AdminDashboard from './components/AdminDashboard';
 import ServicesAndRates from './components/ServicesAndRates';
@@ -24,30 +25,40 @@ const INITIAL_BOOKINGS: Booking[] = [
   }
 ];
 
+export type ViewType = 'HOME' | 'CLIENT' | 'ADMIN' | 'SERVICES' | 'STATUS';
+
 export default function App() {
-  const [view, setView] = useState<'CLIENT' | 'ADMIN' | 'SERVICES' | 'STATUS'>('CLIENT');
+  const [view, setView] = useState<ViewType>('HOME');
   const [bookings, setBookings] = useState<Booking[]>(INITIAL_BOOKINGS);
 
   const handleNewBooking = (booking: Booking) => {
     setBookings(prev => [booking, ...prev]);
     alert("Booking Submitted Successfully! Please wait for confirmation.");
-    setView('CLIENT'); // Reset to home
+    setView('HOME');
   };
 
   const handleUpdateStatus = (id: string, status: any) => {
     setBookings(prev => prev.map(b => b.id === id ? { ...b, status } : b));
   };
 
+  const handleViewChange = (newView: ViewType) => {
+    setView(newView);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
-      <Navbar currentView={view} onViewChange={setView} />
+      <Navbar currentView={view} onViewChange={handleViewChange} />
       
-      <main className="flex-grow container mx-auto px-4 py-8">
+      <main className={`flex-grow ${view !== 'HOME' ? 'container mx-auto px-4 py-8' : ''}`}>
+        {view === 'HOME' && (
+          <HomePage onViewChange={handleViewChange} />
+        )}
         {view === 'CLIENT' && (
           <BookingWizard onSubmit={handleNewBooking} />
         )}
         {view === 'SERVICES' && (
-          <ServicesAndRates />
+          <ServicesAndRates onBookNow={() => handleViewChange('CLIENT')} />
         )}
         {view === 'STATUS' && (
           <CheckStatus bookings={bookings} />
@@ -57,7 +68,7 @@ export default function App() {
         )}
       </main>
 
-      <footer className="bg-gray-800 text-white py-6 text-center text-sm">
+      <footer className="text-white py-6 text-center text-sm" style={{ backgroundColor: '#383838' }}>
         <p>&copy; {new Date().getFullYear()} Wash & Go Baliwag Branch. All rights reserved.</p>
       </footer>
     </div>

@@ -1,19 +1,23 @@
 import React from 'react';
-import { CheckCircle2, Droplets, Car, ShieldCheck } from 'lucide-react';
+import { CheckCircle2, Droplets, Car, ShieldCheck, ArrowRight } from 'lucide-react';
 
-export default function ServicesAndRates() {
+interface ServicesAndRatesProps {
+  onBookNow?: () => void;
+}
+
+export default function ServicesAndRates({ onBookNow }: ServicesAndRatesProps) {
   return (
     <div className="max-w-6xl mx-auto animate-fade-in space-y-12 pb-12">
       <div className="text-center mb-10">
         <h2 className="text-4xl font-black text-gray-900 italic uppercase mb-4">Services Offered</h2>
-        <p className="text-gray-500 max-w-2xl mx-auto">
+        <p className="text-gray-500 max-w-2xl mx-auto mb-6">
           Explore our premium auto detailing packages designed to protect and enhance your vehicle.
         </p>
       </div>
 
       {/* LUBE & GO Section */}
       <section className="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100">
-        <div className="bg-gradient-to-r from-orange-600 to-red-600 p-6 flex items-center justify-center gap-3">
+        <div className="p-6 flex items-center justify-center gap-3" style={{ backgroundImage: 'linear-gradient(to right, #ee4923, #F4921F)' }}>
           <Droplets className="text-white w-8 h-8" />
           <h3 className="text-3xl font-black text-white italic tracking-wider">LUBE & GO</h3>
         </div>
@@ -47,7 +51,7 @@ export default function ServicesAndRates() {
 
           {/* PREMIUM */}
           <div className="p-8">
-            <div className="bg-orange-600 text-white text-center py-2 font-bold text-xl uppercase tracking-widest mb-6 rounded">
+            <div className="text-white text-center py-2 font-bold text-xl uppercase tracking-widest mb-6 rounded" style={{ backgroundColor: '#ee4923' }}>
               PREMIUM
             </div>
              <p className="text-sm text-gray-500 text-center italic mb-6 px-4">
@@ -97,7 +101,7 @@ export default function ServicesAndRates() {
 
       {/* AUTO GROOMING Section */}
       <section className="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100">
-         <div className="bg-gray-800 p-6 flex items-center justify-center gap-3">
+         <div className="p-6 flex items-center justify-center gap-3" style={{ backgroundColor: '#383838' }}>
           <Car className="text-orange-500 w-8 h-8" />
           <h3 className="text-3xl font-black text-white italic tracking-wider uppercase">Auto Grooming</h3>
         </div>
@@ -105,7 +109,7 @@ export default function ServicesAndRates() {
         <div className="p-0 overflow-x-auto">
           <table className="w-full text-sm lg:text-base">
             <thead>
-              <tr className="bg-orange-600 text-white">
+              <tr style={{ backgroundColor: '#ee4923' }} className="text-white">
                 <th className="p-4 text-left font-bold italic uppercase tracking-wider w-1/3">Services</th>
                 <th className="p-4 text-center font-bold w-1/6">S</th>
                 <th className="p-4 text-center font-bold w-1/6">M</th>
@@ -156,7 +160,7 @@ export default function ServicesAndRates() {
 
       {/* CERAMIC COATING Section */}
       <section className="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100">
-         <div className="bg-orange-600 p-6 flex items-center justify-center gap-3">
+         <div className="p-6 flex items-center justify-center gap-3" style={{ backgroundColor: '#ee4923' }}>
           <ShieldCheck className="text-white w-8 h-8" />
           <h3 className="text-3xl font-black text-white italic tracking-wider uppercase">Ceramic Coating</h3>
         </div>
@@ -222,10 +226,28 @@ export default function ServicesAndRates() {
             </tbody>
           </table>
         </div>
-        <div className="bg-gray-900 text-white text-[10px] md:text-xs p-3 text-center">
+        <div className="text-white text-[10px] md:text-xs p-3 text-center" style={{ backgroundColor: '#383838' }}>
              Note: Less 10% discount applies for Club Wash & Go Member only.
         </div>
       </section>
+
+      {/* CTA Section */}
+      {onBookNow && (
+        <section className="rounded-2xl p-10 text-center shadow-lg" style={{ backgroundImage: 'linear-gradient(to right, #ee4923, #F4921F)' }}>
+          <h3 className="text-2xl md:text-3xl font-black text-white mb-3">Ready to Book?</h3>
+          <p className="text-white/90 mb-6 max-w-xl mx-auto">
+            Give your car the premium care it deserves. Book your service now and experience the Wash & Go difference.
+          </p>
+          <button
+            onClick={onBookNow}
+            className="group inline-flex items-center gap-2 bg-white font-bold py-3 px-10 rounded-xl hover:bg-gray-50 transition-all shadow-lg hover:-translate-y-0.5 text-lg"
+            style={{ color: '#ee4923' }}
+          >
+            Book a Service Now
+            <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+          </button>
+        </section>
+      )}
 
     </div>
   );

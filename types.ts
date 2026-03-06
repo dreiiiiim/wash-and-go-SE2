@@ -11,9 +11,25 @@ export enum VehicleSize {
   EXTRA_LARGE = 'EXTRA_LARGE'
 }
 
+export enum VehicleType {
+  VEHICLE = 'VEHICLE',
+  MOTORCYCLE = 'MOTORCYCLE'
+}
+
 export enum FuelType {
   GAS = 'GAS',
   DIESEL = 'DIESEL'
+}
+
+export enum OilType {
+  REGULAR = 'REGULAR',
+  SEMI_SYNTHETIC = 'SEMI_SYNTHETIC',
+  FULLY_SYNTHETIC = 'FULLY_SYNTHETIC'
+}
+
+export enum LubePackageType {
+  EXPRESS = 'EXPRESS',
+  PREMIUM = 'PREMIUM'
 }
 
 export enum BookingStatus {
@@ -28,8 +44,23 @@ export interface ServicePackage {
   category: ServiceCategory;
   name: string;
   description: string;
-  prices: Record<VehicleSize, number>;
   durationHours: number;
+
+  // For Grooming & Ceramic services — price varies by vehicle size
+  prices: Record<VehicleSize, number>;
+
+  // For Lube services — flat price by fuel type (no vehicle size variation)
+  lubePrices?: Record<FuelType, number>;
+
+  // Lube-specific fields
+  lubePackageType?: LubePackageType;
+  oilType?: OilType;
+
+  // Ceramic-specific: Vehicle vs Motorcycle
+  vehicleType?: VehicleType;
+
+  // Whether this service uses flat pricing (lubePrices) instead of size-based pricing
+  isLubeFlat?: boolean;
 }
 
 export interface Booking {
@@ -39,13 +70,15 @@ export interface Booking {
   serviceId: string;
   serviceName: string;
   vehicleSize: VehicleSize;
-  fuelType?: FuelType; // For Lube
+  vehicleType?: VehicleType;
+  fuelType?: FuelType;
+  oilType?: OilType;
   date: string; // YYYY-MM-DD
   timeSlot: string; // HH:mm
   totalPrice: number;
   downPaymentAmount: number;
   status: BookingStatus;
-  paymentProofUrl?: string; // Mocked URL
+  paymentProofUrl?: string;
   createdAt: number;
 }
 

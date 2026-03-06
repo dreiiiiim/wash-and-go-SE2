@@ -19,10 +19,24 @@ export default function PaymentForm({ service, vehicleSize, fuelType, date, time
   const [method, setMethod] = useState(PAYMENT_METHODS[0].id);
   const [proofFile, setProofFile] = useState<File | null>(null);
 
-  const totalPrice = service.prices[vehicleSize];
+  // Calculate price based on service type
+  let totalPrice: number;
+  if (service.isLubeFlat && service.lubePrices && fuelType) {
+    totalPrice = service.lubePrices[fuelType];
+  } else if (service.isLubeFlat) {
+    totalPrice = Object.values(service.prices)[0];
+  } else {
+    totalPrice = service.prices[vehicleSize];
+  }
+
   const downPayment = totalPrice * DOWN_PAYMENT_PERCENTAGE;
   
   const selectedMethodDetails = PAYMENT_METHODS.find(m => m.id === method);
+
+  // Build display labels
+  const vehicleLabel = service.isLubeFlat
+    ? (fuelType ? fuelType : 'N/A')
+    : `${vehicleSize}${service.vehicleType ? ` (${service.vehicleType})` : ''}${fuelType ? ` — ${fuelType}` : ''}`;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -48,8 +62,10 @@ export default function PaymentForm({ service, vehicleSize, fuelType, date, time
           
           <div className="grid grid-cols-2 gap-2">
             <div>
-                <span className="block text-xs text-gray-500">Vehicle</span>
-                <span className="block font-bold text-gray-900">{vehicleSize} {fuelType ? `(${fuelType})` : ''}</span>
+                <span className="block text-xs text-gray-500">
+                  {service.isLubeFlat ? 'Fuel Type' : 'Vehicle'}
+                </span>
+                <span className="block font-bold text-gray-900">{vehicleLabel}</span>
             </div>
             <div>
                 <span className="block text-xs text-gray-500">Schedule</span>

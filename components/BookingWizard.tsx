@@ -42,11 +42,29 @@ export default function BookingWizard({ onSubmit }: BookingWizardProps) {
     if (step > 1) setStep(prev => (prev - 1) as Step);
   };
 
+  // Calculate the correct price based on service type
+  const calculatePrice = (): number => {
+    if (!selectedService || !vehicleSize) return 0;
+
+    // Lube flat pricing — use lubePrices if available and fuel type is selected
+    if (selectedService.isLubeFlat && selectedService.lubePrices && fuelType) {
+      return selectedService.lubePrices[fuelType];
+    }
+
+    // Lube flat pricing — Express (no fuel type selected, use first price)
+    if (selectedService.isLubeFlat) {
+      return Object.values(selectedService.prices)[0];
+    }
+
+    // Standard pricing — by vehicle size
+    return selectedService.prices[vehicleSize];
+  };
+
   const handleFinalSubmit = (customerDetails: { name: string, phone: string, proof: string }) => {
     if (!selectedService || !vehicleSize || !date || !timeSlot) return;
 
-    const price = selectedService.prices[vehicleSize];
-    const downPayment = price * 0.30; // 30% from constants usually, hardcoded here for type safety context
+    const price = calculatePrice();
+    const downPayment = price * 0.30;
 
     const newBooking: Booking = {
       id: `BK-${Math.floor(Math.random() * 1000000)}`,
@@ -55,7 +73,9 @@ export default function BookingWizard({ onSubmit }: BookingWizardProps) {
       serviceId: selectedService.id,
       serviceName: selectedService.name,
       vehicleSize: vehicleSize,
+      vehicleType: selectedService.vehicleType || undefined,
       fuelType: fuelType || undefined,
+      oilType: selectedService.oilType || undefined,
       date: date,
       timeSlot: timeSlot,
       totalPrice: price,
@@ -111,7 +131,7 @@ export default function BookingWizard({ onSubmit }: BookingWizardProps) {
 
         {step === 2 && selectedService && (
           <VehicleSelection 
-            serviceCategory={selectedService.category} 
+            service={selectedService}
             onSelect={handleVehicleSelect}
             onBack={handleBack}
           />

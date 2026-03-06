@@ -5,7 +5,14 @@ import BookingWizard from './components/BookingWizard';
 import AdminDashboard from './components/AdminDashboard';
 import ServicesAndRates from './components/ServicesAndRates';
 import CheckStatus from './components/CheckStatus';
+import AuthPage from './components/AuthPage';
 import { Booking } from './types';
+
+export interface AppUser {
+  name: string;
+  email: string;
+  isStaff: boolean;
+}
 
 // Mock initial data
 const INITIAL_BOOKINGS: Booking[] = [
@@ -25,11 +32,12 @@ const INITIAL_BOOKINGS: Booking[] = [
   }
 ];
 
-export type ViewType = 'HOME' | 'CLIENT' | 'ADMIN' | 'SERVICES' | 'STATUS';
+export type ViewType = 'HOME' | 'CLIENT' | 'ADMIN' | 'SERVICES' | 'STATUS' | 'AUTH';
 
 export default function App() {
   const [view, setView] = useState<ViewType>('HOME');
   const [bookings, setBookings] = useState<Booking[]>(INITIAL_BOOKINGS);
+  const [user, setUser] = useState<AppUser | null>(null);
 
   const handleNewBooking = (booking: Booking) => {
     setBookings(prev => [booking, ...prev]);
@@ -41,18 +49,38 @@ export default function App() {
     setBookings(prev => prev.map(b => b.id === id ? { ...b, status } : b));
   };
 
+  const handleAuthSuccess = (loggedInUser: AppUser) => {
+    setUser(loggedInUser);
+    setView(loggedInUser.isStaff ? 'ADMIN' : 'CLIENT');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleLogout = () => {
+    setUser(null);
+    setView('HOME');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   const handleViewChange = (newView: ViewType) => {
+    if (newView === 'CLIENT' && !user) {
+      setView('AUTH');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
     setView(newView);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
-      <Navbar currentView={view} onViewChange={handleViewChange} />
-      
-      <main className={`flex-grow ${view !== 'HOME' ? 'container mx-auto px-4 py-8' : ''}`}>
+      <Navbar currentView={view} onViewChange={handleViewChange} user={user} onLogout={handleLogout} />
+
+      <main className={`flex-grow ${view !== 'HOME' && view !== 'AUTH' ? 'container mx-auto px-4 py-8' : ''}`}>
         {view === 'HOME' && (
           <HomePage onViewChange={handleViewChange} />
+        )}
+        {view === 'AUTH' && (
+          <AuthPage onAuthSuccess={handleAuthSuccess} />
         )}
         {view === 'CLIENT' && (
           <BookingWizard onSubmit={handleNewBooking} />

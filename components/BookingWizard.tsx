@@ -13,28 +13,34 @@ type Step = 1 | 2 | 3 | 4;
 
 export default function BookingWizard({ onSubmit }: BookingWizardProps) {
   const [step, setStep] = useState<Step>(1);
-  
+
   // Form State
-  const [selectedService, setSelectedService] = useState<ServicePackage | null>(null);
+  const [vehicleType, setVehicleType] = useState<'Car' | 'Motorcycle' | null>(null);
   const [vehicleSize, setVehicleSize] = useState<VehicleSize | null>(null);
   const [fuelType, setFuelType] = useState<FuelType | null>(null);
+
+  const [selectedService, setSelectedService] = useState<ServicePackage | null>(null);
+
   const [date, setDate] = useState<string>('');
   const [timeSlot, setTimeSlot] = useState<string>('');
-  
-  const handleServiceSelect = (service: ServicePackage) => {
-    setSelectedService(service);
+  const [plateNumber, setPlateNumber] = useState('');
+
+  const handleVehicleSelect = (type: 'Car' | 'Motorcycle', size: VehicleSize, fuel: FuelType) => {
+    setVehicleType(type);
+    setVehicleSize(size);
+    setFuelType(fuel);
     setStep(2);
   };
 
-  const handleVehicleSelect = (size: VehicleSize, fuel?: FuelType) => {
-    setVehicleSize(size);
-    if (fuel) setFuelType(fuel);
+  const handleServiceSelect = (service: ServicePackage) => {
+    setSelectedService(service);
     setStep(3);
   };
 
-  const handleScheduleSelect = (dateStr: string, timeStr: string) => {
+  const handleScheduleSelect = (dateStr: string, timeStr: string, plate: string) => {
     setDate(dateStr);
     setTimeSlot(timeStr);
+    setPlateNumber(plate);
     setStep(4);
   };
 
@@ -73,11 +79,13 @@ export default function BookingWizard({ onSubmit }: BookingWizardProps) {
       serviceId: selectedService.id,
       serviceName: selectedService.name,
       vehicleSize: vehicleSize,
-      vehicleType: selectedService.vehicleType || undefined,
+      vehicleType: vehicleType,
+      vehicleCategory: vehicleType, // to match AdminDashboard fields
       fuelType: fuelType || undefined,
       oilType: selectedService.oilType || undefined,
       date: date,
       timeSlot: timeSlot,
+      plateNumber: plateNumber,
       totalPrice: price,
       downPaymentAmount: downPayment,
       status: 'PENDING' as any,
@@ -88,11 +96,13 @@ export default function BookingWizard({ onSubmit }: BookingWizardProps) {
     onSubmit(newBooking);
     // Reset form
     setStep(1);
-    setSelectedService(null);
+    setVehicleType(null);
     setVehicleSize(null);
     setFuelType(null);
+    setSelectedService(null);
     setDate('');
     setTimeSlot('');
+    setPlateNumber('');
   };
 
   return (
@@ -102,16 +112,15 @@ export default function BookingWizard({ onSubmit }: BookingWizardProps) {
         <div className="flex items-center justify-between relative">
           <div className="absolute left-0 top-1/2 transform -translate-y-1/2 w-full h-1 bg-gray-200 -z-10" />
           {[
-            { num: 1, label: 'SERVICE' },
-            { num: 2, label: 'VEHICLE' },
+            { num: 1, label: 'VEHICLE' },
+            { num: 2, label: 'SERVICE' },
             { num: 3, label: 'SCHEDULE' },
             { num: 4, label: 'PAYMENT' }
           ].map((s) => (
             <div key={s.num} className="flex flex-col items-center bg-gray-50 px-2">
-              <div 
-                className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm transition-colors ${
-                  step >= s.num ? 'bg-orange-600 text-white' : 'bg-gray-200 text-gray-500'
-                }`}
+              <div
+                className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm transition-colors ${step >= s.num ? 'bg-orange-600 text-white' : 'bg-gray-200 text-gray-500'
+                  }`}
               >
                 {s.num}
               </div>
@@ -126,27 +135,29 @@ export default function BookingWizard({ onSubmit }: BookingWizardProps) {
       {/* Content Area */}
       <div className="bg-white rounded-2xl shadow-xl p-6 md:p-8 min-h-[400px]">
         {step === 1 && (
-          <ServiceSelection onSelect={handleServiceSelect} />
+          <VehicleSelection onSelect={handleVehicleSelect} />
         )}
 
-        {step === 2 && selectedService && (
-          <VehicleSelection 
-            service={selectedService}
-            onSelect={handleVehicleSelect}
+        {step === 2 && vehicleType && vehicleSize && (
+          <ServiceSelection
+            vehicleType={vehicleType}
+            vehicleSize={vehicleSize}
+            fuelType={fuelType}
+            onSelect={handleServiceSelect}
             onBack={handleBack}
           />
         )}
 
         {step === 3 && (
-          <ScheduleSelection 
-            onSelect={handleScheduleSelect} 
+          <ScheduleSelection
+            onSelect={handleScheduleSelect}
             onBack={handleBack}
             serviceDuration={selectedService?.durationHours || 1}
           />
         )}
 
         {step === 4 && selectedService && vehicleSize && (
-          <PaymentForm 
+          <PaymentForm
             service={selectedService}
             vehicleSize={vehicleSize}
             fuelType={fuelType}

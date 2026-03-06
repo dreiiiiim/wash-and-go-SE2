@@ -4,7 +4,7 @@ import { Calendar as CalendarIcon, Clock } from 'lucide-react';
 import { format, addDays, isBefore, startOfToday } from 'date-fns';
 
 interface ScheduleSelectionProps {
-  onSelect: (date: string, time: string) => void;
+  onSelect: (date: string, time: string, plateNumber: string) => void;
   onBack: () => void;
   serviceDuration: number;
 }
@@ -14,19 +14,20 @@ export default function ScheduleSelection({ onSelect, onBack, serviceDuration }:
   // Default to tomorrow to be safe
   const [selectedDate, setSelectedDate] = useState<string>(format(addDays(today, 1), 'yyyy-MM-dd'));
   const [selectedTime, setSelectedTime] = useState<string>('');
+  const [plateNumber, setPlateNumber] = useState('');
 
   // Mock function to check availability
   // In a real app, this would fetch from backend based on `selectedDate` and `serviceDuration`
   const getSlotAvailability = (time: string) => {
     // Randomly disable slots to simulate capacity
     // Hash based on date + time string to be consistent per render
-    const hash = (selectedDate + time).split('').reduce((a,b)=>a+b.charCodeAt(0),0);
+    const hash = (selectedDate + time).split('').reduce((a, b) => a + b.charCodeAt(0), 0);
     return hash % 5 !== 0; // 20% chance of being booked
   };
 
   const handleContinue = () => {
-    if (selectedDate && selectedTime) {
-      onSelect(selectedDate, selectedTime);
+    if (selectedDate && selectedTime && plateNumber.trim()) {
+      onSelect(selectedDate, selectedTime, plateNumber.trim());
     }
   };
 
@@ -39,17 +40,17 @@ export default function ScheduleSelection({ onSelect, onBack, serviceDuration }:
           <CalendarIcon size={14} /> Preferred Date
         </label>
         <div className="relative">
-            <input
+          <input
             type="date"
             min={format(today, 'yyyy-MM-dd')}
             value={selectedDate}
             onChange={(e) => {
-                setSelectedDate(e.target.value);
-                setSelectedTime(''); // Reset time when date changes
+              setSelectedDate(e.target.value);
+              setSelectedTime(''); // Reset time when date changes
             }}
             className="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl font-bold text-lg text-gray-800 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 appearance-none"
-            />
-            {/* Custom calendar icon overlay can be added here with absolute positioning if native picker icon isn't enough */}
+          />
+          {/* Custom calendar icon overlay can be added here with absolute positioning if native picker icon isn't enough */}
         </div>
       </div>
 
@@ -57,7 +58,7 @@ export default function ScheduleSelection({ onSelect, onBack, serviceDuration }:
         <label className="flex items-center gap-2 text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">
           <Clock size={14} /> Available Slots
         </label>
-        
+
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
           {TIME_SLOTS.map((time) => {
             const isAvailable = getSlotAvailability(time);
@@ -66,13 +67,12 @@ export default function ScheduleSelection({ onSelect, onBack, serviceDuration }:
                 key={time}
                 disabled={!isAvailable}
                 onClick={() => setSelectedTime(time)}
-                className={`py-3 px-2 rounded-lg text-sm font-bold border transition-all ${
-                  !isAvailable 
+                className={`py-3 px-2 rounded-lg text-sm font-bold border transition-all ${!isAvailable
                     ? 'bg-gray-100 text-gray-300 border-gray-100 cursor-not-allowed decoration-slice'
                     : selectedTime === time
-                        ? 'bg-orange-600 text-white border-orange-600 shadow-md'
-                        : 'bg-white text-gray-600 border-gray-200 hover:border-orange-300 hover:text-orange-600'
-                }`}
+                      ? 'bg-orange-600 text-white border-orange-600 shadow-md'
+                      : 'bg-white text-gray-600 border-gray-200 hover:border-orange-300 hover:text-orange-600'
+                  }`}
               >
                 {time}
                 {!isAvailable && <span className="block text-[10px] font-normal">Fully Booked</span>}
@@ -83,16 +83,31 @@ export default function ScheduleSelection({ onSelect, onBack, serviceDuration }:
         <p className="text-xs text-gray-400 mt-2">* Note: Service duration is approx {serviceDuration} hours.</p>
       </div>
 
+      <div className="mb-10">
+        <label className="flex items-center gap-2 text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">
+          Vehicle Plate Number
+        </label>
+        <div className="relative">
+          <input
+            type="text"
+            required
+            value={plateNumber}
+            onChange={e => setPlateNumber(e.target.value)}
+            placeholder="e.g. ABC 1234"
+            className="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl font-bold text-lg text-gray-800 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 uppercase"
+          />
+        </div>
+      </div>
+
       <div className="flex justify-between pt-4">
         <button onClick={onBack} className="px-6 py-3 font-bold text-gray-500 hover:text-gray-900">
           BACK
         </button>
-        <button 
+        <button
           onClick={handleContinue}
-          disabled={!selectedDate || !selectedTime}
-          className={`px-8 py-3 rounded-lg font-bold text-white transition-colors ${
-            selectedDate && selectedTime ? 'bg-orange-600 hover:bg-orange-700' : 'bg-gray-300 cursor-not-allowed'
-          }`}
+          disabled={!selectedDate || !selectedTime || !plateNumber.trim()}
+          className={`px-8 py-3 rounded-lg font-bold text-white transition-colors ${selectedDate && selectedTime && plateNumber.trim() ? 'bg-orange-600 hover:bg-orange-700' : 'bg-gray-300 cursor-not-allowed'
+            }`}
         >
           PROCEED
         </button>

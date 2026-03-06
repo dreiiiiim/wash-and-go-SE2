@@ -6,13 +6,14 @@ import AdminDashboard from './components/AdminDashboard';
 import ServicesAndRates from './components/ServicesAndRates';
 import CheckStatus from './components/CheckStatus';
 import AuthPage from './components/AuthPage';
-import { Booking } from './types';
+import { Booking, BookingStatus } from './types';
 
-export interface AppUser {
+// Shared user type — exported so AuthPage can import it
+export type AppUser = {
   name: string;
   email: string;
   isStaff: boolean;
-}
+};
 
 // Mock initial data
 const INITIAL_BOOKINGS: Booking[] = [
@@ -45,8 +46,20 @@ export default function App() {
     setView('HOME');
   };
 
-  const handleUpdateStatus = (id: string, status: any) => {
+  const handleUpdateStatus = (id: string, status: BookingStatus) => {
     setBookings(prev => prev.map(b => b.id === id ? { ...b, status } : b));
+  };
+
+  const handleAddUpdate = (id: string, message: string, imageUrl?: string) => {
+    const newUpdate = {
+      id: Math.random().toString(36).substring(2, 9),
+      timestamp: new Date().toISOString(),
+      message,
+      imageUrl,
+    };
+    setBookings(prev => prev.map(b =>
+      b.id === id ? { ...b, updates: [...(b.updates || []), newUpdate] } : b
+    ));
   };
 
   const handleAuthSuccess = (loggedInUser: AppUser) => {
@@ -75,7 +88,7 @@ export default function App() {
     <div className="min-h-screen flex flex-col bg-gray-50">
       <Navbar currentView={view} onViewChange={handleViewChange} user={user} onLogout={handleLogout} />
 
-      <main className={`flex-grow ${view !== 'HOME' && view !== 'AUTH' ? 'container mx-auto px-4 py-8' : ''}`}>
+      <main className={`flex-grow ${view !== 'HOME' ? 'container mx-auto px-4 py-8' : ''}`}>
         {view === 'HOME' && (
           <HomePage onViewChange={handleViewChange} />
         )}
@@ -92,12 +105,12 @@ export default function App() {
           <CheckStatus bookings={bookings} />
         )}
         {view === 'ADMIN' && (
-          <AdminDashboard bookings={bookings} onUpdateStatus={handleUpdateStatus} />
+          <AdminDashboard bookings={bookings} onUpdateStatus={handleUpdateStatus} onAddUpdate={handleAddUpdate} />
         )}
       </main>
 
       <footer className="text-white py-6 text-center text-sm" style={{ backgroundColor: '#383838' }}>
-        <p>&copy; {new Date().getFullYear()} Wash & Go Baliwag Branch. All rights reserved.</p>
+        <p>&copy; {new Date().getFullYear()} Wash &amp; Go Baliwag Branch. All rights reserved.</p>
       </footer>
     </div>
   );

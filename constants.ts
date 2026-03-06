@@ -120,6 +120,7 @@ const GROOMING_INTERIOR: ServicePackage = {
   name: 'Interior Detailing',
   description: 'Deep cleaning of seats, carpets, dashboard, and sanitation.',
   durationHours: 3,
+  vehicleType: VehicleType.VEHICLE,
   prices: {
     [VehicleSize.SMALL]: 2700,
     [VehicleSize.MEDIUM]: 3700,
@@ -134,6 +135,7 @@ const GROOMING_EXTERIOR: ServicePackage = {
   name: 'Exterior Detailing',
   description: 'Multi-step wash, clay bar, polish, and wax application.',
   durationHours: 3,
+  vehicleType: VehicleType.VEHICLE,
   prices: {
     [VehicleSize.SMALL]: 3800,
     [VehicleSize.MEDIUM]: 4800,
@@ -148,6 +150,7 @@ const GROOMING_FULL: ServicePackage = {
   name: 'Full Detailing',
   description: 'Complete interior and exterior restoration package.',
   durationHours: 6,
+  vehicleType: VehicleType.VEHICLE,
   prices: {
     [VehicleSize.SMALL]: 5500,
     [VehicleSize.MEDIUM]: 7300,
@@ -162,6 +165,7 @@ const GROOMING_ENGINE: ServicePackage = {
   name: 'Engine Detailing',
   description: 'Thorough engine bay cleaning, degreasing, and finishing.',
   durationHours: 2,
+  vehicleType: VehicleType.VEHICLE,
   prices: {
     [VehicleSize.SMALL]: 1000,
     [VehicleSize.MEDIUM]: 1250,
@@ -176,11 +180,43 @@ const GROOMING_GLASS: ServicePackage = {
   name: 'Glass Detailing',
   description: 'Complete glass cleaning, water spot removal, and protective coating.',
   durationHours: 2,
+  vehicleType: VehicleType.VEHICLE,
   prices: {
     [VehicleSize.SMALL]: 2000,
     [VehicleSize.MEDIUM]: 2100,
     [VehicleSize.LARGE]: 2300,
     [VehicleSize.EXTRA_LARGE]: 2500,
+  },
+};
+
+// --- MOTORCYCLE GROOMING ---
+const MOTO_REGULAR_WASH: ServicePackage = {
+  id: 'moto-regular-wash',
+  category: ServiceCategory.GROOMING,
+  name: 'Regular Carwash',
+  description: 'Standard wash, degreasing, and tire black.',
+  durationHours: 1,
+  vehicleType: VehicleType.MOTORCYCLE,
+  prices: {
+    [VehicleSize.SMALL]: 150,
+    [VehicleSize.MEDIUM]: 200,
+    [VehicleSize.LARGE]: 250,
+    [VehicleSize.EXTRA_LARGE]: 300,
+  },
+};
+
+const MOTO_WASH_WAX: ServicePackage = {
+  id: 'moto-wash-wax',
+  category: ServiceCategory.GROOMING,
+  name: 'Carwash with Wax',
+  description: 'Standard wash, degreasing, tire black, and premium wax application.',
+  durationHours: 1,
+  vehicleType: VehicleType.MOTORCYCLE,
+  prices: {
+    [VehicleSize.SMALL]: 250,
+    [VehicleSize.MEDIUM]: 350,
+    [VehicleSize.LARGE]: 450,
+    [VehicleSize.EXTRA_LARGE]: 550,
   },
 };
 
@@ -299,6 +335,8 @@ export const SERVICES: ServicePackage[] = [
   GROOMING_FULL,
   GROOMING_ENGINE,
   GROOMING_GLASS,
+  MOTO_REGULAR_WASH,
+  MOTO_WASH_WAX,
   // Ceramic Coating
   CERAMIC_1YR_VEHICLE,
   CERAMIC_1YR_MOTORCYCLE,

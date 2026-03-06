@@ -63,6 +63,13 @@ export interface ServicePackage {
   isLubeFlat?: boolean;
 }
 
+export interface BookingUpdate {
+  id: string;
+  timestamp: string;
+  message: string;
+  imageUrl?: string;
+}
+
 export interface Booking {
   id: string;
   customerName: string;
@@ -74,12 +81,24 @@ export interface Booking {
   fuelType?: FuelType;
   oilType?: OilType;
   date: string; // YYYY-MM-DD
-  timeSlot: string; // HH:mm
+  timeSlot: string; // HH:mm AM/PM
   totalPrice: number;
   downPaymentAmount: number;
   status: BookingStatus;
   paymentProofUrl?: string;
   createdAt: number;
+
+  // Extended admin fields
+  contact?: string;           // alias / display for customerPhone
+  email?: string;
+  vehicleCategory?: 'Car' | 'Motorcycle';
+  bayType?: 'Wash' | 'Lube' | 'Detailing' | 'Coating';
+  plateNumber?: string;
+  time?: string;              // display time (e.g. '09:00 AM'), falls back to timeSlot
+  downPayment?: number;       // alias for downPaymentAmount
+  paymentMethod?: string;
+  referenceNumber?: string;
+  updates?: BookingUpdate[];
 }
 
 export interface TimeSlot {
